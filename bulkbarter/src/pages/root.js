@@ -5,6 +5,7 @@ import { Route, Routes } from "react-router";
 import App from "../App";
 import SignIn from "./login";
 import SignUp from "./signup";
+import Dashboard from "./dashboard";
 
 export default function Root() {
   return (
@@ -15,6 +16,7 @@ export default function Root() {
         <Route path="/" element={<App />} />
         <Route path="signin" element={<SignIn />} />
         <Route path="signup" element={<SignUp />} />
+        <Route path="dashboard" element={<Dashboard />} />
       </Routes>
     </>
   );

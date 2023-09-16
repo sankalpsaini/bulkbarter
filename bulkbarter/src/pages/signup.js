@@ -116,7 +116,11 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              <NavLink
+                    to="/dashboard"
+                    className="cursor-pointer inline-flex items-center bg-gray-800 border-0 py-1 px-3 focus:outline-none hover:bg-orange-900 rounded text-base mt-4 md:mt-0">
+                        {"Sign Up"}
+                </NavLink>
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>

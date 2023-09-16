@@ -11,6 +11,7 @@ import reportWebVitals from './reportWebVitals';
 import SignIn from './pages/login';
 import SignUp from './pages/signup';
 import Root from './pages/root';
+import Dashboard from './pages/dashboard';
 
 const router = createBrowserRouter([
   {
@@ -28,6 +29,10 @@ const router = createBrowserRouter([
       {
         path: `/signin`,
         element: <SignIn />,
+      },
+      {
+        path: `/dashboard`,
+        element: <Dashboard />,
       },
     ]
   },
