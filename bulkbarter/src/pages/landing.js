@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { NavLink } from "react-router-dom";
 
 export default function Landing() {
@@ -19,7 +20,10 @@ export default function Landing() {
       </header>
 
       <div className="relative isolate px-6 lg:px-8">
-        <div className="mx-auto max-w-2xl pt-44">
+        <div className="mx-auto max-w-2xl">
+          <div className='flex justify-center pb-4'>
+            <img alt="Logo" src="/landingbulkbarterlogo.png" sx={{ width: 350, height: 350 }}/>
+          </div>
           <div className="text-center">
             <h1 className="text-4xl font-bold tracking-tight text-[#c1a865] sm:text-6xl">
               Buy together and save big on groceries
