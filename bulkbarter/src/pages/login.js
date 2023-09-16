@@ -15,7 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink, Outlet } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import {db} from '../firebase_setup/firebase';
-import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { getAuth, signInWithEmailAndPassword, signOut  } from "firebase/auth";
 
 
 const auth = getAuth();
@@ -37,6 +37,7 @@ const theme = createTheme();
 
 export default function SignIn() {
   const handleSubmit = (event) => {
+    signOut(auth);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
@@ -50,12 +51,14 @@ export default function SignIn() {
       // Signed in 
       console.log("Sucess");
       const user = userCredential.user;
+      console.log(auth.currentUser);
       // ...
     })
     .catch((error) => {
       console.log("Fail");
       const errorCode = error.code;
       const errorMessage = error.message;
+      console.log(auth.currentUser);
     });
   };
 
