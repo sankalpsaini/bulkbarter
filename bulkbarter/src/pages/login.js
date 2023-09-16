@@ -15,6 +15,10 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink, Outlet } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import {db} from '../firebase_setup/firebase';
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+
+
+const auth = getAuth();
 
 function Copyright(props) {
   return (
@@ -38,6 +42,20 @@ export default function SignIn() {
     console.log({
       email: data.get('email'),
       password: data.get('password'),
+    });
+    const email = data.get('email');
+    const password = data.get('password');
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      console.log("Sucess");
+      const user = userCredential.user;
+      // ...
+    })
+    .catch((error) => {
+      console.log("Fail");
+      const errorCode = error.code;
+      const errorMessage = error.message;
     });
   };
 
