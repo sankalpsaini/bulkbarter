@@ -163,16 +163,15 @@ export default function SignUp() {
                 />
               </Grid> */}
             </Grid>
-            <NavLink to="/dashboard" className="cursor-pointer">
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
+                onClick={SignUp}
                 sx={{ mt: 3, mb: 2 }}
               >
                 {"Sign Up"}
               </Button>
-            </NavLink>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <NavLink to="/signin" className="cursor-pointer">
