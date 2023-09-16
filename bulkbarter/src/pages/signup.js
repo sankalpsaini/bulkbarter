@@ -65,9 +65,11 @@ export default function SignUp() {
             LastName: data.get("lastName"),
           });
           console.log("Document written with ID: ", docRef.id);
+          window.location.replace('/SignIn');
         } catch (e) {
           console.error("Error adding document: ", e);
         }
+
       // ...
     })
     .catch((error) => {

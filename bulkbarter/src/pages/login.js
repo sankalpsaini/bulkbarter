@@ -57,6 +57,7 @@ export default function SignIn() {
       console.log("Sucess");
       const user = userCredential.user;
       console.log(auth.currentUser);
+      window.location.replace('/dashboard');
       // ...
     })
     .catch((error) => {
