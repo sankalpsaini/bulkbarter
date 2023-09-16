@@ -13,6 +13,8 @@ import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink, Outlet } from "react-router-dom";
+import { collection, addDoc } from "firebase/firestore";
+import {db} from '../firebase_setup/firebase';
 
 function Copyright(props) {
   return (
