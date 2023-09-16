@@ -34,6 +34,7 @@ function Copyright(props) {
 
 // TODO remove, this demo shouldn't need to reset the theme.
 
+
 const defaultTheme = createTheme();
 export default function SignUp() {
   const handleSubmit = (event) => {
@@ -51,6 +52,16 @@ export default function SignUp() {
       // Signed in 
       const user = userCredential.user;
       console.log("Success")
+      try {
+          const docRef = addDoc(collection(db, "Users"), {
+            Email: data.get('email'),
+            FirstName: data.get("firstName"),
+            LastName: data.get("lastName"),
+          });
+          console.log("Document written with ID: ", docRef.id);
+        } catch (e) {
+          console.error("Error adding document: ", e);
+        }
       // ...
     })
     .catch((error) => {
