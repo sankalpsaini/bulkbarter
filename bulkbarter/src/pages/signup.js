@@ -15,6 +15,9 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink, Outlet } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import {db} from '../firebase_setup/firebase';
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
+const auth = getAuth();
 
 function Copyright(props) {
   return (
@@ -32,7 +35,6 @@ function Copyright(props) {
 // TODO remove, this demo shouldn't need to reset the theme.
 
 const defaultTheme = createTheme();
-
 export default function SignUp() {
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -40,6 +42,22 @@ export default function SignUp() {
     console.log({
       email: data.get('email'),
       password: data.get('password'),
+    });
+    const email = data.get('email');
+    const password = data.get('password');
+
+    createUserWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      const user = userCredential.user;
+      console.log("Success")
+      // ...
+    })
+    .catch((error) => {
+      console.log("Error")
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // ..
     });
   };
 
