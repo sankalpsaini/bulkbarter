@@ -15,7 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { NavLink, Outlet } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import {db} from '../firebase_setup/firebase';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword, signOut } from "firebase/auth";
 
 const auth = getAuth();
 
@@ -38,6 +38,7 @@ function Copyright(props) {
 const defaultTheme = createTheme();
 export default function SignUp() {
   const handleSubmit = (event) => {
+    signOut(auth);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
