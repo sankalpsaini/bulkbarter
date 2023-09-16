@@ -91,10 +91,6 @@ async function AddPost(data) {
   }
 }
 
-
-function GetID() {
-  
-}
 function Copyright(props) {
   return (
     <Typography
