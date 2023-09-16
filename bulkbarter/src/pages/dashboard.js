@@ -16,6 +16,76 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
+import { collection, addDoc, setDoc } from "firebase/firestore";
+import {db} from '../firebase_setup/firebase';
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+
+const auth = getAuth();
+
+async function GetUserInfo() {
+  try {
+    const user = auth.currentUser;
+    
+    if (user) {
+      const userEmail = user.email;
+
+      // Query the "Users" collection for the document with matching email
+      const userQuerySnapshot = await db.collection("Users").where("Email", "==", userEmail).get();
+
+      if (!userQuerySnapshot.empty) {
+        // There should be only one document with a matching email
+        const userData = userQuerySnapshot.docs[0].data();
+        return userData;
+      } else {
+        console.log("No user found with this email.");
+        return null;
+      }
+    } else {
+      console.log("No user is currently signed in.");
+      return null;
+    }
+  } catch (error) {
+    console.error("Error getting user info: ", error);
+    throw error;
+  }
+}
+
+async function AddPost(data) {
+  try {
+    // Create a new post document
+    const postDocRef = await addDoc(collection(db, "Posts"), {
+      Description: data.get('description'),
+      EndTime: data.get('time'),
+      MoU: data.get('mou'),
+      NoU: data.get('nou'),
+      Party: data.get('party'),
+      Picture: "",
+      Store: data.get('store'),
+      User: data.get('userName'),
+      Comid: "" // Initialize Comid with an empty string
+    });
+
+    console.log("Post Document written with ID: ", postDocRef.id);
+
+    // Create a new comment document
+    const commentDocRef = await addDoc(collection(db, "Comments"), {
+      Users: {} // Initialize Users with an empty map
+    });
+
+    console.log("Comment Document written with ID: ", commentDocRef.id);
+
+    // Update the Comid field in the post document with the ID of the comment document
+    await setDoc(collection(db, "Posts", postDocRef.id), {
+      Comid: commentDocRef.id
+    }, { merge: true });
+
+    console.log("Comid field in Post Document updated with Comment Document ID.");
+
+  } catch (e) {
+    console.error("Error adding document: ", e);
+  }
+}
+
 
 const navigation = [
   { name: "Dashboard", href: "#", icon: HomeIcon, current: true },
