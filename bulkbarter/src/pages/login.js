@@ -115,16 +115,15 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <NavLink to="/dashboard" className="cursor-pointer">
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
+                onSubmit={handleSubmit}
                 sx={{ mt: 3, mb: 2 }}
               >
                 {"Sign In"}
               </Button>
-            </NavLink>
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
