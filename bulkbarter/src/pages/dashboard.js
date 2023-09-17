@@ -104,7 +104,7 @@ export default function Dashboard() {
   const [store, setStore] = React.useState(null);
   const [price, setPrice] = React.useState(null);
 
-  let [isOpen, setIsOpen] = useState(true);
+  let [isOpen, setIsOpen] = useState(false)
 
   async function AddPost() {
     try {
@@ -115,7 +115,7 @@ export default function Dashboard() {
         NoU: nou,
         Party: "",
         Price: price,
-        Picture: "selectedImage",
+        Picture: selectedImage,
         Store: store,
         User: "data.get('userName')",
         Comid: "", // Initialize Comid with an empty string
@@ -461,7 +461,7 @@ export default function Dashboard() {
                     <span className="sr-only">Open user menu</span>
                     <img
                       className="h-8 w-8 rounded-full bg-gray-50"
-                      src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                      src="https://i.pinimg.com/474x/5d/cf/02/5dcf02265a260bb0902c1ec504d1743b.jpg"
                       alt=""
                     />
                     <span className="hidden lg:flex lg:items-center">
@@ -512,7 +512,7 @@ export default function Dashboard() {
           <main className="py-10">
 
             <div className="px-4 sm:px-6 lg:px-8">
-              <div className="absolute bottom-10 right-10">
+              <div className="bottom-10 right-10 fixed">
                 <Fab color="primary" aria-label="add" onClick={openModal}>
                   <AddIcon />
                 </Fab>
