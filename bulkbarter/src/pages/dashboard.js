@@ -21,6 +21,8 @@ import { getAuth } from "firebase/auth";
 
 const auth = getAuth();
 
+
+
 async function GetUserInfo() {
   try {
     const user = auth.currentUser;
@@ -112,10 +114,15 @@ const userNavigation = [
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-
+async function GetPosts() {
+  const pcol = collection(db,"Posts");
+  const pdoc = await getDocs(pcol);
+  return pdoc;
+}
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [userData, setUserInfo] = useState(null);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -123,15 +130,32 @@ export default function Dashboard() {
         const user = auth.currentUser;
         if (user) {
           const userEmail = user.email;
-          const usersCollection = collection(db, "Users");
-          const q = query(usersCollection, where("Email", "==", userEmail));
-          const querySnapshot = await getDocs(q);
 
-          if (!querySnapshot.empty) {
-            const userData = querySnapshot.docs[0].data();
+          // Fetch user data
+          const usersCollection = collection(db, "Users");
+          const userQuery = query(usersCollection, where("Email", "==", userEmail));
+          const userQuerySnapshot = await getDocs(userQuery);
+
+          if (!userQuerySnapshot.empty) {
+            const userData = userQuerySnapshot.docs[0].data();
             setUserInfo(userData); // Set the user data in the component state
           } else {
             console.log("No user found with this email.");
+          }
+
+          // Fetch posts
+          const postsCollection = collection(db, "Posts");
+          const postsQuerySnapshot = await getDocs(postsCollection);
+
+          if (!postsQuerySnapshot.empty) {
+            const postList = [];
+            postsQuerySnapshot.forEach((doc) => {
+              const postData = doc.data();
+              postList.push(postData);
+            });
+            setPosts(postList); // Set the post data in the component state
+          } else {
+            console.log("No posts found.");
           }
         } else {
           console.log("No user is currently signed in.");
@@ -143,10 +167,35 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
-  
+
   // Check if userData is null before accessing its properties
   const firstName = userData ? userData["FirstName"] : "";
   const lastName = userData ? userData["LastName"] : "";
+
+  const postsdb = posts.map((post) =>
+  <Listing
+  Description = {post.Description}
+  User = {post.User}
+  Picture = {post.Picture}
+  Store = {post.Store}
+  EndTime = {post.EndTime}
+  price = {post.Price}
+  MoU = {post.MoU}
+  NoU = {post.NoU}
+
+    // Description="Pickle Jars (4L)"
+    // User="Zaddimus Prime"
+    // Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
+    // Store="CostCo South Edmonton"
+    // EndTime="Sep 17 10:15 a.m."
+    // price="2.50"
+    // MoU="4"
+    // NoU="100"
+  ></Listing>
+  );
+
+
+  
   
   return (
     <>
@@ -437,6 +486,7 @@ export default function Dashboard() {
                 MoU="4"
                 NoU="100"
               ></Listing>
+              {postsdb}
             </div>
           </main>
         </div>
