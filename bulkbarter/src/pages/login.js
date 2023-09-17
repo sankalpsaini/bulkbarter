@@ -16,7 +16,7 @@ import { NavLink, Outlet } from "react-router-dom";
 import { collection, addDoc } from "firebase/firestore";
 import {db} from '../firebase_setup/firebase';
 import { getAuth, signInWithEmailAndPassword, signOut  } from "firebase/auth";
-
+import { useNavigate } from "react-router-dom";
 
 const auth = getAuth();
 
@@ -41,6 +41,7 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+  const navObj = useNavigate();
   const handleSubmit = (event) => {
     signOut(auth);
     event.preventDefault();
@@ -57,7 +58,8 @@ export default function SignIn() {
       console.log("Sucess");
       const user = userCredential.user;
       console.log(auth.currentUser);
-      window.location.replace('/dashboard');
+      navObj('/dashboard');
+      console.log("Shouldn't")
       // ...
     })
     .catch((error) => {
