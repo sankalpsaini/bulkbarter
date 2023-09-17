@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -16,25 +16,33 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
-import { collection, addDoc, setDoc } from "firebase/firestore";
-import {db} from '../firebase_setup/firebase';
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { collection, query, where, getDocs, doc, getDoc, addDoc, setDoc } from "firebase/firestore";
+import { db } from '../firebase_setup/firebase';
+import { getAuth } from "firebase/auth";
 
 const auth = getAuth();
 
 async function GetUserInfo() {
   try {
     const user = auth.currentUser;
-    
+    console.log(user);
+
     if (user) {
       const userEmail = user.email;
 
-      // Query the "Users" collection for the document with matching email
-      const userQuerySnapshot = await db.collection("Users").where("Email", "==", userEmail).get();
+      // Create a reference to the "Users" collection
+      const usersCollection = collection(db, "Users");
 
-      if (!userQuerySnapshot.empty) {
+      // Create a query to find documents where the "Email" field matches the user's email
+      const q = query(usersCollection, where("Email", "==", userEmail));
+
+      // Execute the query to get a list of matching documents
+      const querySnapshot = await getDocs(q);
+      console.log(querySnapshot)
+
+      if (!querySnapshot.empty) {
         // There should be only one document with a matching email
-        const userData = userQuerySnapshot.docs[0].data();
+        const userData = querySnapshot.docs[0].data();
         return userData;
       } else {
         console.log("No user found with this email.");
@@ -50,15 +58,17 @@ async function GetUserInfo() {
   }
 }
 
+
 async function AddPost(data) {
   try {
     // Create a new post document
+    const party = [data.Username]
     const postDocRef = await addDoc(collection(db, "Posts"), {
       Description: data.get('description'),
       EndTime: data.get('time'),
       MoU: data.get('mou'),
       NoU: data.get('nou'),
-      Party: data.get('party'),
+      Party: party,
       Picture: "",
       Store: data.get('store'),
       User: data.get('userName'),
@@ -111,7 +121,39 @@ function classNames(...classes) {
 
 export default function Example() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [userData, setUserInfo] = useState(null);
 
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userEmail = user.email;
+          const usersCollection = collection(db, "Users");
+          const q = query(usersCollection, where("Email", "==", userEmail));
+          const querySnapshot = await getDocs(q);
+
+          if (!querySnapshot.empty) {
+            const userData = querySnapshot.docs[0].data();
+            setUserInfo(userData); // Set the user data in the component state
+          } else {
+            console.log("No user found with this email.");
+          }
+        } else {
+          console.log("No user is currently signed in.");
+        }
+      } catch (error) {
+        console.error("Error getting user info: ", error);
+      }
+    }
+
+    fetchData();
+  }, []);
+  
+  // Check if userData is null before accessing its properties
+  const firstName = userData ? userData["FirstName"] : "";
+  const lastName = userData ? userData["LastName"] : "";
+  
   return (
     <>
       {/*
@@ -406,7 +448,7 @@ export default function Example() {
                         className="ml-4 text-sm font-semibold leading-6 text-gray-900"
                         aria-hidden="true"
                       >
-                        Tom Cook
+                        {firstName + " " + lastName}
                       </span>
                       <ChevronDownIcon
                         className="ml-2 h-5 w-5 text-gray-400"

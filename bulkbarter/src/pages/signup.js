@@ -37,12 +37,10 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
-
 const defaultTheme = createTheme();
+
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     signOut(auth);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -53,32 +51,27 @@ export default function SignUp() {
     const email = data.get('email');
     const password = data.get('password');
 
-    createUserWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
       // Signed in 
       const user = userCredential.user;
-      console.log("Success")
-      try {
-          const docRef = addDoc(collection(db, "Users"), {
-            Email: data.get('email'),
-            FirstName: data.get("firstName"),
-            LastName: data.get("lastName"),
-          });
-          console.log("Document written with ID: ", docRef.id);
-          window.location.replace('/SignIn');
-        } catch (e) {
-          console.error("Error adding document: ", e);
-        }
+      console.log("Success");
 
-      // ...
-    })
-    .catch((error) => {
-      console.log("Error")
-      const errorCode = error.code;
-      const errorMessage = error.message;
-      // ..
-    });
+      // Add user data to Firestore
+      const docRef = await addDoc(collection(db, "Users"), {
+        Email: email,
+        FirstName: data.get("firstName"),
+        LastName: data.get("lastName"),
+      });
+
+      console.log("Document written with ID: ", docRef.id);
+      window.location.replace('/SignIn');
+    } catch (error) {
+      console.error("Error signing up or adding document: ", error);
+    }
   };
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
