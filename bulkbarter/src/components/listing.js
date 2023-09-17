@@ -11,7 +11,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 export default function Listing(props) {
   return (
-    <Card sx={{ border: 1, maxWidth: 345 }}>
+    <Card sx={{ border: 1, height: 530, width: 310 }}>
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="listing">
@@ -26,12 +26,14 @@ export default function Listing(props) {
         title={props.Description}
         subheader={props.EndTime + " •  $" + props.price}
       />
-      <CardMedia
-        component="img"
-        height="20"
-        image={props.Picture ? props.Picture : "/default.jpeg"}
-        alt={props.Description}
-      />
+      <div className="h-[300px]">
+        <CardMedia
+          component="img"
+          height="20"
+          image={props.Picture ? props.Picture : "/default.jpeg"}
+          alt={props.Description}
+        />
+      </div>
       <CardContent>
         <Typography variant="body2" color="text.secondary">
           <div>Total units available: {props.NoU}</div>
