@@ -1,3 +1,4 @@
+import React from "react";
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
@@ -14,10 +15,23 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
+
 import Listing from "../components/listing";
-import { collection, query, where, getDocs, doc, getDoc, addDoc, setDoc } from "firebase/firestore";
-import { db } from '../firebase_setup/firebase';
-import { getAuth } from "firebase/auth";
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../firebase_setup/firebase";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
+import { TextField, FormControl, Button } from "@mui/material";
 
 const auth = getAuth();
 
@@ -39,7 +53,7 @@ async function GetUserInfo() {
 
       // Execute the query to get a list of matching documents
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot)
+      console.log(querySnapshot);
 
       if (!querySnapshot.empty) {
         // There should be only one document with a matching email
@@ -58,45 +72,6 @@ async function GetUserInfo() {
     throw error;
   }
 }
-
-
-async function AddPost(data) {
-  try {
-    // Create a new post document
-    const party = [data.Username]
-    const postDocRef = await addDoc(collection(db, "Posts"), {
-      Description: data.get('description'),
-      EndTime: data.get('time'),
-      MoU: data.get('mou'),
-      NoU: data.get('nou'),
-      Party: party,
-      Picture: "",
-      Store: data.get('store'),
-      User: data.get('userName'),
-      Comid: "" // Initialize Comid with an empty string
-    });
-
-    console.log("Post Document written with ID: ", postDocRef.id);
-
-    // Create a new comment document
-    const commentDocRef = await addDoc(collection(db, "Comments"), {
-      Users: {} // Initialize Users with an empty map
-    });
-
-    console.log("Comment Document written with ID: ", commentDocRef.id);
-
-    // Update the Comid field in the post document with the ID of the comment document
-    await setDoc(collection(db, "Posts", postDocRef.id), {
-      Comid: commentDocRef.id
-    }, { merge: true });
-
-    console.log("Comid field in Post Document updated with Comment Document ID.");
-
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
 
 const navigation = [
   { name: "Shop", href: "#", icon: ShoppingBagIcon, current: true },
@@ -121,6 +96,64 @@ async function GetPosts() {
 }
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = React.useState(null);
+  const [postDescription, setPostDescription] = React.useState(null);
+  const [endTime, setEndTime] = React.useState(null);
+  const [mou, setMou] = React.useState(null);
+  const [nou, setNou] = React.useState(null);
+  const [store, setStore] = React.useState(null);
+  const [price, setPrice] = React.useState(null);
+
+  let [isOpen, setIsOpen] = useState(true);
+
+  async function AddPost() {
+    try {
+      const postDocRef = await addDoc(collection(db, "Posts"), {
+        Description: postDescription,
+        EndTime: endTime,
+        MoU: mou,
+        NoU: nou,
+        Party: "",
+        Price: price,
+        Picture: "selectedImage",
+        Store: store,
+        User: "data.get('userName')",
+        Comid: "", // Initialize Comid with an empty string
+      });
+
+      console.log("Post Document written with ID: ", postDocRef.id);
+
+      // Create a new comment document
+      const commentDocRef = await addDoc(collection(db, "Comments"), {
+        Users: {}, // Initialize Users with an empty map
+      });
+
+      console.log("Comment Document written with ID: ", commentDocRef.id);
+
+      // Update the Comid field in the post document with the ID of the comment document
+      await setDoc(
+        collection(db, "Posts", postDocRef.id),
+        {
+          Comid: commentDocRef.id,
+        },
+        { merge: true }
+      );
+
+      console.log(
+        "Comid field in Post Document updated with Comment Document ID."
+      );
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
+
+  function closeModal() {
+    setIsOpen(false);
+  }
+
+  function openModal() {
+    setIsOpen(true);
+  }
   const [userData, setUserInfo] = useState(null);
   const [posts, setPosts] = useState([]);
 
@@ -172,6 +205,7 @@ export default function Dashboard() {
   const firstName = userData ? userData["FirstName"] : "";
   const lastName = userData ? userData["LastName"] : "";
 
+
   const postsdb = posts.map((post) =>
   <Listing
   Description = {post.Description}
@@ -197,6 +231,7 @@ export default function Dashboard() {
 
   
   
+
   return (
     <>
       <div>
@@ -253,11 +288,11 @@ export default function Dashboard() {
                     </div>
                   </Transition.Child>
                   {/* Sidebar component, swap this element with another sidebar if you like */}
-                  <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
+                  <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-[#273458] px-6 pb-4">
                     <div className="flex h-16 shrink-0 items-center">
                       <img
                         className="h-8 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=white"
+                        src="/landingbulkbarterlogo.png"
                         alt="Your Company"
                       />
                     </div>
@@ -316,11 +351,11 @@ export default function Dashboard() {
         {/* Static sidebar for desktop */}
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
-            <div className="flex h-16 shrink-0 items-center">
+          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-[#273458] px-6 pb-6">
+            <div className="flex h-16 shrink-0 items-center pt-4">
               <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=white"
+                className="h-16 w-auto"
+                src="/landingbulkbarterlogo.png"
                 alt="Your Company"
               />
             </div>
@@ -475,6 +510,153 @@ export default function Dashboard() {
           </div>
 
           <main className="py-10">
+
+            <div className="px-4 sm:px-6 lg:px-8">
+              <div className="absolute bottom-10 right-10">
+                <Fab color="primary" aria-label="add" onClick={openModal}>
+                  <AddIcon />
+                </Fab>
+
+                <Transition appear show={isOpen} as={Fragment}>
+                  <Dialog
+                    as="div"
+                    className="relative z-10"
+                    onClose={closeModal}
+                  >
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0"
+                      enterTo="opacity-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <div className="fixed inset-0 bg-black bg-opacity-25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                      <div className="flex min-h-full items-center justify-center p-4 text-center">
+                        <Transition.Child
+                          as={Fragment}
+                          enter="ease-out duration-300"
+                          enterFrom="opacity-0 scale-95"
+                          enterTo="opacity-100 scale-100"
+                          leave="ease-in duration-200"
+                          leaveFrom="opacity-100 scale-100"
+                          leaveTo="opacity-0 scale-95"
+                        >
+                          <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Title
+                              as="h3"
+                              className="text-3xl font-medium leading-6 text-gray-900 pb-4"
+                            >
+                              Create listing
+                            </Dialog.Title>
+                            <div className="mt-2">
+                              <FormControl className="text-sm">
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Description"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) =>
+                                    setPostDescription(e.target.value)
+                                  }
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Amount you have"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setNou(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Minimum to buy"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setMou(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Store"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setStore(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="End Time"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setEndTime(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Price"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setPrice(e.target.value)}
+                                />
+                                <div>
+                                  {selectedImage && (
+                                    <div>
+                                      <img
+                                        alt="not found"
+                                        width={"100px"}
+                                        src={URL.createObjectURL(selectedImage)}
+                                      />
+                                      <br />
+                                      <button
+                                        onClick={() => setSelectedImage(null)}
+                                      >
+                                        Remove
+                                      </button>
+                                    </div>
+                                  )}
+                                </div>
+                                <Button variant="contained" component="label">
+                                  Upload Image
+                                  <input
+                                    hidden
+                                    accept="image/*"
+                                    multiple
+                                    type="file"
+                                    name="myImage"
+                                    aria-label="myImage"
+                                    onChange={(event) => {
+                                      setSelectedImage(event.target.files[0]);
+                                    }}
+                                  />
+                                </Button>
+                              </FormControl>
+                              {/* <p className="text-sm text-gray-500">
+                                Your payment has been successfully submitted. We’ve sent
+                                you an email with all of the details of your order.
+                              </p> */}
+                            </div>
+
+                            <div className="mt-4">
+                              <button
+                                type="button"
+                                className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                onClick={() => {
+                                  AddPost();
+                                  closeModal();
+                                }}
+                              >
+                                Post!
+                              </button>
+                            </div>
+                          </Dialog.Panel>
+                        </Transition.Child>
+                      </div>
+                    </div>
+                  </Dialog>
+                </Transition>
+              </div>
+
             <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
               <Listing
                 Description="Pickle Jars (4L)"
@@ -487,6 +669,7 @@ export default function Dashboard() {
                 NoU="100"
               ></Listing>
               {postsdb}
+
             </div>
           </main>
         </div>
