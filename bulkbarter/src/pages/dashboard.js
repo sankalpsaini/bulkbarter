@@ -1,4 +1,4 @@
-import React from 'react'
+import React from "react";
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
@@ -17,14 +17,25 @@ import {
 } from "@heroicons/react/20/solid";
 
 import Listing from "../components/listing";
-import { collection, query, where, getDocs, doc, getDoc, addDoc, setDoc } from "firebase/firestore";
-import {db} from '../firebase_setup/firebase';
+import {
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  setDoc,
+} from "firebase/firestore";
+import { db } from "../firebase_setup/firebase";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import Fab from '@mui/material/Fab';
-import AddIcon from '@mui/icons-material/Add';
+import Fab from "@mui/material/Fab";
+import AddIcon from "@mui/icons-material/Add";
 import { TextField, FormControl, Button } from "@mui/material";
 
 const auth = getAuth();
+
+
 
 async function GetUserInfo() {
   try {
@@ -42,7 +53,7 @@ async function GetUserInfo() {
 
       // Execute the query to get a list of matching documents
       const querySnapshot = await getDocs(q);
-      console.log(querySnapshot)
+      console.log(querySnapshot);
 
       if (!querySnapshot.empty) {
         // There should be only one document with a matching email
@@ -62,7 +73,6 @@ async function GetUserInfo() {
   }
 }
 
-
 const navigation = [
   { name: "Shop", href: "#", icon: ShoppingBagIcon, current: true },
   { name: "Friends", href: "#", icon: UsersIcon, current: false },
@@ -79,7 +89,11 @@ const userNavigation = [
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-
+async function GetPosts() {
+  const pcol = collection(db,"Posts");
+  const pdoc = await getDocs(pcol);
+  return pdoc;
+}
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
@@ -104,38 +118,44 @@ export default function Dashboard() {
         Picture: selectedImage,
         Store: store,
         User: "data.get('userName')",
-        Comid: "" // Initialize Comid with an empty string
+        Comid: "", // Initialize Comid with an empty string
       });
-  
+
       console.log("Post Document written with ID: ", postDocRef.id);
-  
+
       // Create a new comment document
       const commentDocRef = await addDoc(collection(db, "Comments"), {
-        Users: {} // Initialize Users with an empty map
+        Users: {}, // Initialize Users with an empty map
       });
-  
+
       console.log("Comment Document written with ID: ", commentDocRef.id);
-  
+
       // Update the Comid field in the post document with the ID of the comment document
-      await setDoc(collection(db, "Posts", postDocRef.id), {
-        Comid: commentDocRef.id
-      }, { merge: true });
-  
-      console.log("Comid field in Post Document updated with Comment Document ID.");
-  
+      await setDoc(
+        collection(db, "Posts", postDocRef.id),
+        {
+          Comid: commentDocRef.id,
+        },
+        { merge: true }
+      );
+
+      console.log(
+        "Comid field in Post Document updated with Comment Document ID."
+      );
     } catch (e) {
       console.error("Error adding document: ", e);
     }
   }
 
   function closeModal() {
-    setIsOpen(false)
+    setIsOpen(false);
   }
 
   function openModal() {
-    setIsOpen(true)
+    setIsOpen(true);
   }
   const [userData, setUserInfo] = useState(null);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     async function fetchData() {
@@ -143,15 +163,32 @@ export default function Dashboard() {
         const user = auth.currentUser;
         if (user) {
           const userEmail = user.email;
-          const usersCollection = collection(db, "Users");
-          const q = query(usersCollection, where("Email", "==", userEmail));
-          const querySnapshot = await getDocs(q);
 
-          if (!querySnapshot.empty) {
-            const userData = querySnapshot.docs[0].data();
+          // Fetch user data
+          const usersCollection = collection(db, "Users");
+          const userQuery = query(usersCollection, where("Email", "==", userEmail));
+          const userQuerySnapshot = await getDocs(userQuery);
+
+          if (!userQuerySnapshot.empty) {
+            const userData = userQuerySnapshot.docs[0].data();
             setUserInfo(userData); // Set the user data in the component state
           } else {
             console.log("No user found with this email.");
+          }
+
+          // Fetch posts
+          const postsCollection = collection(db, "Posts");
+          const postsQuerySnapshot = await getDocs(postsCollection);
+
+          if (!postsQuerySnapshot.empty) {
+            const postList = [];
+            postsQuerySnapshot.forEach((doc) => {
+              const postData = doc.data();
+              postList.push(postData);
+            });
+            setPosts(postList); // Set the post data in the component state
+          } else {
+            console.log("No posts found.");
           }
         } else {
           console.log("No user is currently signed in.");
@@ -163,11 +200,38 @@ export default function Dashboard() {
 
     fetchData();
   }, []);
-  
+
   // Check if userData is null before accessing its properties
   const firstName = userData ? userData["FirstName"] : "";
   const lastName = userData ? userData["LastName"] : "";
+
+
+  const postsdb = posts.map((post) =>
+  <Listing
+  Description = {post.Description}
+  User = {post.User}
+  Picture = {post.Picture}
+  Store = {post.Store}
+  EndTime = {post.EndTime}
+  price = {post.Price}
+  MoU = {post.MoU}
+  NoU = {post.NoU}
+
+    // Description="Pickle Jars (4L)"
+    // User="Zaddimus Prime"
+    // Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
+    // Store="CostCo South Edmonton"
+    // EndTime="Sep 17 10:15 a.m."
+    // price="2.50"
+    // MoU="4"
+    // NoU="100"
+  ></Listing>
+  );
+
+
   
+  
+
   return (
     <>
       <div>
@@ -224,11 +288,11 @@ export default function Dashboard() {
                     </div>
                   </Transition.Child>
                   {/* Sidebar component, swap this element with another sidebar if you like */}
-                  <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
+                  <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-[#273458] px-6 pb-4">
                     <div className="flex h-16 shrink-0 items-center">
                       <img
                         className="h-8 w-auto"
-                        src="https://tailwindui.com/img/logos/mark.svg?color=white"
+                        src="/landingbulkbarterlogo.png"
                         alt="Your Company"
                       />
                     </div>
@@ -287,11 +351,11 @@ export default function Dashboard() {
         {/* Static sidebar for desktop */}
         <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
           {/* Sidebar component, swap this element with another sidebar if you like */}
-          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-indigo-600 px-6 pb-4">
-            <div className="flex h-16 shrink-0 items-center">
+          <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-[#273458] px-6 pb-6">
+            <div className="flex h-16 shrink-0 items-center pt-4">
               <img
-                className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=white"
+                className="h-16 w-auto"
+                src="/landingbulkbarterlogo.png"
                 alt="Your Company"
               />
             </div>
@@ -446,15 +510,19 @@ export default function Dashboard() {
           </div>
 
           <main className="py-10">
+
             <div className="px-4 sm:px-6 lg:px-8">
-          
               <div className="absolute bottom-10 right-10">
                 <Fab color="primary" aria-label="add" onClick={openModal}>
                   <AddIcon />
                 </Fab>
-              
+
                 <Transition appear show={isOpen} as={Fragment}>
-                  <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                  <Dialog
+                    as="div"
+                    className="relative z-10"
+                    onClose={closeModal}
+                  >
                     <Transition.Child
                       as={Fragment}
                       enter="ease-out duration-300"
@@ -486,44 +554,82 @@ export default function Dashboard() {
                               Create listing
                             </Dialog.Title>
                             <div className="mt-2">
-                              <FormControl className='text-sm'>
-                                <TextField type="text" color='primary' label="Description" sx={{ m: 1 }} onChange={(e) => setPostDescription(e.target.value)}/>
-                                <TextField type="text" color='primary' label="Amount you have" sx={{ m: 1 }} onChange={(e) => setNou(e.target.value)}/>
-                                <TextField type="text" color='primary' label="Minimum to buy" sx={{ m: 1 }} onChange={(e) => setMou(e.target.value)}/>
-                                <TextField type="text" color='primary' label="Store" sx={{ m: 1 }} onChange={(e) => setStore(e.target.value)}/>
-                                <TextField type="text" color='primary' label="End Time" sx={{ m: 1 }} onChange={(e) => setEndTime(e.target.value)}/>
-                                <TextField type="text" color='primary' label="Price" sx={{ m: 1 }} onChange={(e) => setPrice(e.target.value)}/>
+                              <FormControl className="text-sm">
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Description"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) =>
+                                    setPostDescription(e.target.value)
+                                  }
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Amount you have"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setNou(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Minimum to buy"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setMou(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Store"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setStore(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="End Time"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setEndTime(e.target.value)}
+                                />
+                                <TextField
+                                  type="text"
+                                  color="primary"
+                                  label="Price"
+                                  sx={{ m: 1 }}
+                                  onChange={(e) => setPrice(e.target.value)}
+                                />
                                 <div>
-                                {selectedImage && (
+                                  {selectedImage && (
                                     <div>
-                                        <img
-                                            alt="not found"
-                                            width={"100px"}
-                                            src={URL.createObjectURL(selectedImage)}
-                                        />
-                                    <br />
-                                        <button onClick={() => setSelectedImage(null)}>Remove</button>
+                                      <img
+                                        alt="not found"
+                                        width={"100px"}
+                                        src={URL.createObjectURL(selectedImage)}
+                                      />
+                                      <br />
+                                      <button
+                                        onClick={() => setSelectedImage(null)}
+                                      >
+                                        Remove
+                                      </button>
                                     </div>
-                                )}
+                                  )}
                                 </div>
-                                <Button 
-                                    variant="contained" 
-                                    component="label" 
-                                    
-                                >
-                                    Upload Image
-                                    <input 
-                                        hidden accept="image/*" 
-                                        multiple type="file" 
-                                        name='myImage'
-                                        aria-label='myImage'
-                                        onChange={(event) => {
-                                            setSelectedImage(event.target.files[0]);
-                                        }}
-                                    />
-
+                                <Button variant="contained" component="label">
+                                  Upload Image
+                                  <input
+                                    hidden
+                                    accept="image/*"
+                                    multiple
+                                    type="file"
+                                    name="myImage"
+                                    aria-label="myImage"
+                                    onChange={(event) => {
+                                      setSelectedImage(event.target.files[0]);
+                                    }}
+                                  />
                                 </Button>
-
                               </FormControl>
                               {/* <p className="text-sm text-gray-500">
                                 Your payment has been successfully submitted. We’ve sent
@@ -535,8 +641,10 @@ export default function Dashboard() {
                               <button
                                 type="button"
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
-                                onClick={()=>{AddPost();
-                                closeModal();}}
+                                onClick={() => {
+                                  AddPost();
+                                  closeModal();
+                                }}
                               >
                                 Post!
                               </button>
@@ -548,6 +656,20 @@ export default function Dashboard() {
                   </Dialog>
                 </Transition>
               </div>
+
+            <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+              <Listing
+                Description="Pickle Jars (4L)"
+                User="Zaddimus Prime"
+                Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
+                Store="CostCo South Edmonton"
+                EndTime="Sep 17 10:15 a.m."
+                price="2.50"
+                MoU="4"
+                NoU="100"
+              ></Listing>
+              {postsdb}
+            </div>
             </div>
           </main>
         </div>

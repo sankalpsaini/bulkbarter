@@ -15,7 +15,7 @@ export default function Listing(props) {
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="listing">
-            {props.User[0]}
+            {props.User ? props.User[0] : "?"}
           </Avatar>
         }
         action={
@@ -29,7 +29,7 @@ export default function Listing(props) {
       <CardMedia
         component="img"
         height="20"
-        image={props.Picture}
+        image={props.Picture ? props.Picture : "/default.jpeg"}
         alt={props.Description}
       />
       <CardContent>
