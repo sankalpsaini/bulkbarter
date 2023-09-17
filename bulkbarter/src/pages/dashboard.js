@@ -241,7 +241,7 @@ export default function Dashboard() {
                     <div className="flex h-16 shrink-0 items-center">
                       <img
                         className="h-8 w-auto"
-                        src="/landingbulkbarterlogo.png"
+                        src="/landingbulkbarterlogonotext.png"
                         alt="Your Company"
                       />
                     </div>
@@ -304,7 +304,7 @@ export default function Dashboard() {
             <div className="flex h-16 shrink-0 items-center pt-4">
               <img
                 className="h-16 w-auto"
-                src="/landingbulkbarterlogo.png"
+                src="/landingbulkbarterlogonotext.png"
                 alt="Your Company"
               />
             </div>
