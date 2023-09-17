@@ -28,18 +28,12 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "../firebase_setup/firebase";
-import {
-  getAuth,
-  setPersistence,
-  browserLocalPersistence,
-} from "firebase/auth";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import { TextField, FormControl, Button } from "@mui/material";
-import { NavLink } from "react-router-dom";
 
 const auth = getAuth();
-setPersistence(auth, browserLocalPersistence);
 
 async function GetUserInfo() {
   try {
@@ -78,9 +72,9 @@ async function GetUserInfo() {
 }
 
 const navigation = [
-  { name: "Shop", href: "#", icon: ShoppingBagIcon, current: true },
+  { name: "Shop", href: "#", icon: ShoppingBagIcon, current: false },
   { name: "Friends", href: "#", icon: UsersIcon, current: false },
-  { name: "Trips", href: "/trips", icon: ShoppingCartIcon, current: false },
+  { name: "Trips", href: "#", icon: ShoppingCartIcon, current: true },
   { name: "History", href: "#", icon: ClockIcon, current: false },
 ];
 
@@ -93,12 +87,8 @@ const userNavigation = [
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-async function GetPosts() {
-  const pcol = collection(db, "Posts");
-  const pdoc = await getDocs(pcol);
-  return pdoc;
-}
-export default function Dashboard() {
+
+export default function Trips() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedImage, setSelectedImage] = React.useState(null);
   const [postDescription, setPostDescription] = React.useState(null);
@@ -161,50 +151,50 @@ export default function Dashboard() {
   const [userData, setUserInfo] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  async function fetchData() {
-    try {
-      const user = auth.currentUser;
-      if (user) {
-        const userEmail = user.email;
-
-        // Fetch user data
-        const usersCollection = collection(db, "Users");
-        const userQuery = query(
-          usersCollection,
-          where("Email", "==", userEmail)
-        );
-        const userQuerySnapshot = await getDocs(userQuery);
-
-        if (!userQuerySnapshot.empty) {
-          const userData = userQuerySnapshot.docs[0].data();
-          setUserInfo(userData); // Set the user data in the component state
-        } else {
-          console.log("No user found with this email.");
-        }
-
-        // Fetch posts
-        const postsCollection = collection(db, "Posts");
-        const postsQuerySnapshot = await getDocs(postsCollection);
-
-        if (!postsQuerySnapshot.empty) {
-          const postList = [];
-          postsQuerySnapshot.forEach((doc) => {
-            const postData = doc.data();
-            postList.push(postData);
-          });
-          setPosts(postList); // Set the post data in the component state
-        } else {
-          console.log("No posts found.");
-        }
-      } else {
-        console.log("No user is currently signed in.");
-      }
-    } catch (error) {
-      console.error("Error getting user info: ", error);
-    }
-  }
-
   useEffect(() => {
+    async function fetchData() {
+      try {
+        const user = auth.currentUser;
+        if (user) {
+          const userEmail = user.email;
+
+          // Fetch user data
+          const usersCollection = collection(db, "Users");
+          const userQuery = query(
+            usersCollection,
+            where("Email", "==", userEmail)
+          );
+          const userQuerySnapshot = await getDocs(userQuery);
+
+          if (!userQuerySnapshot.empty) {
+            const userData = userQuerySnapshot.docs[0].data();
+            setUserInfo(userData); // Set the user data in the component state
+          } else {
+            console.log("No user found with this email.");
+          }
+
+          // Fetch posts
+          const postsCollection = collection(db, "Posts");
+          const postsQuerySnapshot = await getDocs(postsCollection);
+
+          if (!postsQuerySnapshot.empty) {
+            const postList = [];
+            postsQuerySnapshot.forEach((doc) => {
+              const postData = doc.data();
+              postList.push(postData);
+            });
+            setPosts(postList); // Set the post data in the component state
+          } else {
+            console.log("No posts found.");
+          }
+        } else {
+          console.log("No user is currently signed in.");
+        }
+      } catch (error) {
+        console.error("Error getting user info: ", error);
+      }
+    }
+
     fetchData();
   }, []);
 
@@ -645,7 +635,6 @@ export default function Dashboard() {
                                 onClick={() => {
                                   AddPost();
                                   closeModal();
-                                  fetchData();
                                 }}
                               >
                                 Post!
@@ -659,18 +648,11 @@ export default function Dashboard() {
                 </Transition>
               </div>
 
-              <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-                <Listing
-                  Description="Pickle Jars (4L)"
-                  User="Zaddimus Prime"
-                  Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                  Store="CostCo South Edmonton"
-                  EndTime="Sep 17 10:15 a.m."
-                  price="2.50"
-                  MoU="4"
-                  NoU="100"
-                ></Listing>
-                {postsdb}
+              <div className="px-4 sm:px-6 lg:px-8">
+                <div className="text-2xl font-bold py-4">Upcoming Trips</div>
+                <div className="text-md font-bold">Pickles</div>
+                <div>Amount: 12</div>
+                <div className="text-red-500">UNCONFIRMED</div>
               </div>
             </div>
           </main>
