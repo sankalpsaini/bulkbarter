@@ -13,6 +13,11 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { NavLink, Outlet } from "react-router-dom";
+import { collection, addDoc } from "firebase/firestore";
+import {db} from '../firebase_setup/firebase';
+import { getAuth, createUserWithEmailAndPassword, signOut } from "firebase/auth";
+
+const auth = getAuth();
 
 function Copyright(props) {
   return (
@@ -32,19 +37,41 @@ function Copyright(props) {
   );
 }
 
-// TODO remove, this demo shouldn't need to reset the theme.
-
 const defaultTheme = createTheme();
 
 export default function SignUp() {
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
+    signOut(auth);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get("email"),
       password: data.get("password"),
     });
+    const email = data.get('email');
+    const password = data.get('password');
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+      // Signed in 
+      const user = userCredential.user;
+      console.log("Success");
+
+      // Add user data to Firestore
+      const docRef = await addDoc(collection(db, "Users"), {
+        Email: email,
+        FirstName: data.get("firstName"),
+        LastName: data.get("lastName"),
+      });
+
+      console.log("Document written with ID: ", docRef.id);
+      window.location.replace('/SignIn');
+    } catch (error) {
+      console.error("Error signing up or adding document: ", error);
+    }
   };
+
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -131,16 +158,15 @@ export default function SignUp() {
                 />
               </Grid> */}
             </Grid>
-            <NavLink to="/dashboard" className="cursor-pointer">
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
+                onClick={SignUp}
                 sx={{ mt: 3, mb: 2 }}
               >
                 {"Sign Up"}
               </Button>
-            </NavLink>
             <Grid container justifyContent="flex-end">
               <Grid item>
                 <NavLink to="/signin" className="cursor-pointer">

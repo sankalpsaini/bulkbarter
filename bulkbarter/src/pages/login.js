@@ -13,6 +13,12 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { NavLink, Outlet } from "react-router-dom";
+import { collection, addDoc } from "firebase/firestore";
+import {db} from '../firebase_setup/firebase';
+import { getAuth, signInWithEmailAndPassword, signOut  } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+
+const auth = getAuth();
 
 function Copyright(props) {
   return (
@@ -35,12 +41,32 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignIn() {
+  const navObj = useNavigate();
   const handleSubmit = (event) => {
+    signOut(auth);
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     console.log({
       email: data.get("email"),
       password: data.get("password"),
+    });
+    const email = data.get('email');
+    const password = data.get('password');
+    signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      // Signed in 
+      console.log("Sucess");
+      const user = userCredential.user;
+      console.log(auth.currentUser);
+      navObj('/dashboard');
+      console.log("Shouldn't")
+      // ...
+    })
+    .catch((error) => {
+      console.log("Fail");
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.log(auth.currentUser);
     });
   };
 
@@ -92,16 +118,15 @@ export default function SignIn() {
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
             />
-            <NavLink to="/dashboard" className="cursor-pointer">
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
+                onSubmit={handleSubmit}
                 sx={{ mt: 3, mb: 2 }}
               >
                 {"Sign In"}
               </Button>
-            </NavLink>
             <Grid container>
               <Grid item xs>
                 <Link href="#" variant="body2">
