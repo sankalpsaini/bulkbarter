@@ -28,12 +28,13 @@ import {
   setDoc,
 } from "firebase/firestore";
 import { db } from "../firebase_setup/firebase";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getAuth, setPersistence, browserLocalPersistence } from "firebase/auth";
 import Fab from "@mui/material/Fab";
 import AddIcon from "@mui/icons-material/Add";
 import { TextField, FormControl, Button } from "@mui/material";
 
 const auth = getAuth();
+setPersistence(auth, browserLocalPersistence)
 
 
 
@@ -157,46 +158,47 @@ export default function Dashboard() {
   const [userData, setUserInfo] = useState(null);
   const [posts, setPosts] = useState([]);
 
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        const user = auth.currentUser;
-        if (user) {
-          const userEmail = user.email;
+  async function fetchData() {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userEmail = user.email;
 
-          // Fetch user data
-          const usersCollection = collection(db, "Users");
-          const userQuery = query(usersCollection, where("Email", "==", userEmail));
-          const userQuerySnapshot = await getDocs(userQuery);
+        // Fetch user data
+        const usersCollection = collection(db, "Users");
+        const userQuery = query(usersCollection, where("Email", "==", userEmail));
+        const userQuerySnapshot = await getDocs(userQuery);
 
-          if (!userQuerySnapshot.empty) {
-            const userData = userQuerySnapshot.docs[0].data();
-            setUserInfo(userData); // Set the user data in the component state
-          } else {
-            console.log("No user found with this email.");
-          }
-
-          // Fetch posts
-          const postsCollection = collection(db, "Posts");
-          const postsQuerySnapshot = await getDocs(postsCollection);
-
-          if (!postsQuerySnapshot.empty) {
-            const postList = [];
-            postsQuerySnapshot.forEach((doc) => {
-              const postData = doc.data();
-              postList.push(postData);
-            });
-            setPosts(postList); // Set the post data in the component state
-          } else {
-            console.log("No posts found.");
-          }
+        if (!userQuerySnapshot.empty) {
+          const userData = userQuerySnapshot.docs[0].data();
+          setUserInfo(userData); // Set the user data in the component state
         } else {
-          console.log("No user is currently signed in.");
+          console.log("No user found with this email.");
         }
-      } catch (error) {
-        console.error("Error getting user info: ", error);
+
+        // Fetch posts
+        const postsCollection = collection(db, "Posts");
+        const postsQuerySnapshot = await getDocs(postsCollection);
+
+        if (!postsQuerySnapshot.empty) {
+          const postList = [];
+          postsQuerySnapshot.forEach((doc) => {
+            const postData = doc.data();
+            postList.push(postData);
+          });
+          setPosts(postList); // Set the post data in the component state
+        } else {
+          console.log("No posts found.");
+        }
+      } else {
+        console.log("No user is currently signed in.");
       }
+    } catch (error) {
+      console.error("Error getting user info: ", error);
     }
+  }
+
+  useEffect(() => {
 
     fetchData();
   }, []);
@@ -644,6 +646,7 @@ export default function Dashboard() {
                                 onClick={() => {
                                   AddPost();
                                   closeModal();
+                                  fetchData();
                                 }}
                               >
                                 Post!
