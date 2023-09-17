@@ -15,7 +15,7 @@ export default function Listing(props) {
       <CardHeader
         avatar={
           <Avatar sx={{ bgcolor: red[500] }} aria-label="listing">
-            {props.User[0]}
+            {props.User ? props.User[0] : "?"}
           </Avatar>
         }
         action={
