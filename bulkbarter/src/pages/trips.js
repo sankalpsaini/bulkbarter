@@ -72,7 +72,7 @@ async function GetUserInfo() {
 }
 
 const navigation = [
-  { name: "Shop", href: "#", icon: ShoppingBagIcon, current: false },
+  { name: "Shop", href: "/dashboard", icon: ShoppingBagIcon, current: false },
   { name: "Friends", href: "#", icon: UsersIcon, current: false },
   { name: "Trips", href: "#", icon: ShoppingCartIcon, current: true },
   { name: "History", href: "#", icon: ClockIcon, current: false },
@@ -81,7 +81,7 @@ const navigation = [
 const userNavigation = [
   { name: "Your profile", href: "#" },
   { name: "Your postings", href: "#" },
-  { name: "Sign out", href: "#" },
+  { name: "Sign out", href: "/" },
 ];
 
 function classNames(...classes) {

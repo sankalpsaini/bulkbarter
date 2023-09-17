@@ -78,7 +78,7 @@ async function GetUserInfo() {
 }
 
 const navigation = [
-  { name: "Shop", href: "#", icon: ShoppingBagIcon, current: true },
+  { name: "Shop", href: "/dashboard", icon: ShoppingBagIcon, current: true },
   { name: "Friends", href: "#", icon: UsersIcon, current: false },
   { name: "Trips", href: "/trips", icon: ShoppingCartIcon, current: false },
   { name: "History", href: "#", icon: ClockIcon, current: false },
@@ -643,7 +643,7 @@ export default function Dashboard() {
                                 type="button"
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                 onClick={() => {
-                                  AddPost(firstName+" "+lastName);
+                                  AddPost(firstName + " " + lastName);
                                   closeModal();
                                   fetchData();
                                 }}
@@ -659,10 +659,9 @@ export default function Dashboard() {
                 </Transition>
               </div>
 
-
-            <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-              {postsdb}
-            </div>
+              <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+                {postsdb}
+              </div>
             </div>
           </main>
         </div>
