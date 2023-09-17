@@ -1,3 +1,4 @@
+import * as React from 'react';
 import { Fragment, useState } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
@@ -17,6 +18,9 @@ import {
 import { collection, addDoc, setDoc } from "firebase/firestore";
 import {db} from '../firebase_setup/firebase';
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import Fab from '@mui/material/Fab';
+import AddIcon from '@mui/icons-material/Add';
+import { TextField, FormControl, Button } from "@mui/material";
 
 const auth = getAuth();
 
@@ -48,42 +52,6 @@ async function GetUserInfo() {
   }
 }
 
-async function AddPost(data) {
-  try {
-    // Create a new post document
-    const postDocRef = await addDoc(collection(db, "Posts"), {
-      Description: data.get('description'),
-      EndTime: data.get('time'),
-      MoU: data.get('mou'),
-      NoU: data.get('nou'),
-      Party: data.get('party'),
-      Picture: "",
-      Store: data.get('store'),
-      User: data.get('userName'),
-      Comid: "" // Initialize Comid with an empty string
-    });
-
-    console.log("Post Document written with ID: ", postDocRef.id);
-
-    // Create a new comment document
-    const commentDocRef = await addDoc(collection(db, "Comments"), {
-      Users: {} // Initialize Users with an empty map
-    });
-
-    console.log("Comment Document written with ID: ", commentDocRef.id);
-
-    // Update the Comid field in the post document with the ID of the comment document
-    await setDoc(collection(db, "Posts", postDocRef.id), {
-      Comid: commentDocRef.id
-    }, { merge: true });
-
-    console.log("Comid field in Post Document updated with Comment Document ID.");
-
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
 
 const navigation = [
   { name: "Shop", href: "#", icon: ShoppingBagIcon, current: true },
@@ -104,6 +72,68 @@ function classNames(...classes) {
 
 export default function Dashboard() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = React.useState(null);
+  const [postDescription, setPostDescription] = React.useState(null);
+  const [endTime, setEndTime] = React.useState(null);
+  const [mou, setMou] = React.useState(null);
+  const [nou, setNou] = React.useState(null);
+  const [store, setStore] = React.useState(null);
+
+  let [isOpen, setIsOpen] = useState(true)
+
+  async function AddPost() {
+    try {
+      // Create a new post document
+      // const postDocRef = await addDoc(collection(db, "Posts"), {
+      //   Description: data.get('description'),
+      //   EndTime: data.get('time'),
+      //   MoU: data.get('mou'),
+      //   NoU: data.get('nou'),
+      //   Party: data.get('party'),
+      //   Picture: "",
+      //   Store: data.get('store'),
+      //   User: data.get('userName'),
+      //   Comid: "" // Initialize Comid with an empty string
+      const postDocRef = await addDoc(collection(db, "Posts"), {
+        Description: postDescription,
+        EndTime: endTime,
+        MoU: mou,
+        NoU: nou,
+        Party: "",
+        Picture: "selectedImage",
+        Store: store,
+        User: "data.get('userName')",
+        Comid: "" // Initialize Comid with an empty string
+      });
+  
+      console.log("Post Document written with ID: ", postDocRef.id);
+  
+      // Create a new comment document
+      const commentDocRef = await addDoc(collection(db, "Comments"), {
+        Users: {} // Initialize Users with an empty map
+      });
+  
+      console.log("Comment Document written with ID: ", commentDocRef.id);
+  
+      // Update the Comid field in the post document with the ID of the comment document
+      await setDoc(collection(db, "Posts", postDocRef.id), {
+        Comid: commentDocRef.id
+      }, { merge: true });
+  
+      console.log("Comid field in Post Document updated with Comment Document ID.");
+  
+    } catch (e) {
+      console.error("Error adding document: ", e);
+    }
+  }
+
+  function closeModal() {
+    setIsOpen(false)
+  }
+
+  function openModal() {
+    setIsOpen(true)
+  }
 
   return (
     <>
@@ -383,7 +413,109 @@ export default function Dashboard() {
           </div>
 
           <main className="py-10">
-            <div className="px-4 sm:px-6 lg:px-8">{/* Your content */}</div>
+            <div className="px-4 sm:px-6 lg:px-8">
+          
+              <div className="absolute bottom-10 right-10">
+                <Fab color="primary" aria-label="add" onClick={openModal}>
+                  <AddIcon />
+                </Fab>
+              
+                <Transition appear show={isOpen} as={Fragment}>
+                  <Dialog as="div" className="relative z-10" onClose={closeModal}>
+                    <Transition.Child
+                      as={Fragment}
+                      enter="ease-out duration-300"
+                      enterFrom="opacity-0"
+                      enterTo="opacity-100"
+                      leave="ease-in duration-200"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <div className="fixed inset-0 bg-black bg-opacity-25" />
+                    </Transition.Child>
+
+                    <div className="fixed inset-0 overflow-y-auto">
+                      <div className="flex min-h-full items-center justify-center p-4 text-center">
+                        <Transition.Child
+                          as={Fragment}
+                          enter="ease-out duration-300"
+                          enterFrom="opacity-0 scale-95"
+                          enterTo="opacity-100 scale-100"
+                          leave="ease-in duration-200"
+                          leaveFrom="opacity-100 scale-100"
+                          leaveTo="opacity-0 scale-95"
+                        >
+                          <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <Dialog.Title
+                              as="h3"
+                              className="text-3xl font-medium leading-6 text-gray-900 pb-4"
+                            >
+                              Create listing
+                            </Dialog.Title>
+                            <div className="mt-2">
+                              <FormControl className='text-sm'>
+                                <TextField type="text" color='primary' label="Description" sx={{ m: 1 }} onChange={(e) => setPostDescription(e.target.value)}/>
+                                <TextField type="text" color='primary' label="Amount you have" sx={{ m: 1 }} onChange={(e) => setNou(e.target.value)}/>
+                                <TextField type="text" color='primary' label="Minimum to buy" sx={{ m: 1 }} onChange={(e) => setMou(e.target.value)}/>
+                                <TextField type="text" color='primary' label="Store" sx={{ m: 1 }} onChange={(e) => setStore(e.target.value)}/>
+                                <TextField type="text" color='primary' label="End Time" sx={{ m: 1 }} onChange={(e) => setEndTime(e.target.value)}/>
+                                <div>
+                                {selectedImage && (
+                                    <div>
+                                        <img
+                                            alt="not found"
+                                            width={"100px"}
+                                            src={URL.createObjectURL(selectedImage)}
+                                        />
+                                    <br />
+                                        <button onClick={() => setSelectedImage(null)}>Remove</button>
+                                    </div>
+                                )}
+                                </div>
+                                <Button 
+                                    variant="contained" 
+                                    component="label" 
+                                    
+                                >
+                                    Upload Image
+                                    <input 
+                                        hidden accept="image/*" 
+                                        multiple type="file" 
+                                        name='myImage'
+                                        aria-label='myImage'
+                                        onChange={(event) => {
+                                            setSelectedImage(event.target.files[0]);
+                                        }}
+                                    />
+
+                                </Button>
+
+                              </FormControl>
+                              {/* <p className="text-sm text-gray-500">
+                                Your payment has been successfully submitted. We’ve sent
+                                you an email with all of the details of your order.
+                              </p> */}
+                            </div>
+
+                            <div className="mt-4">
+                              <button
+                                type="button"
+                                className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                onClick={()=>{AddPost();
+                                closeModal();}}
+                              >
+                                Post!
+                              </button>
+                            </div>
+                          </Dialog.Panel>
+                        </Transition.Child>
+                      </div>
+                    </div>
+                  </Dialog>
+                </Transition>
+              </div>
+
+            </div>
           </main>
         </div>
       </div>
