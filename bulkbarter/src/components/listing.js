@@ -14,8 +14,8 @@ export default function Listing(props) {
     <Card sx={{ border: 1, maxWidth: 345 }}>
       <CardHeader
         avatar={
-          <Avatar sx={{ bgcolor: red[500] }} aria-label="recipe">
-            R
+          <Avatar sx={{ bgcolor: red[500] }} aria-label="listing">
+            {props.User[0]}
           </Avatar>
         }
         action={
@@ -23,18 +23,19 @@ export default function Listing(props) {
             <MoreVertIcon />
           </IconButton>
         }
-        title={props.title}
-        subheader={props.date + " •  $" + props.price}
+        title={props.Description}
+        subheader={props.EndTime + " •  $" + props.price}
       />
       <CardMedia
         component="img"
         height="20"
-        image={props.img}
-        alt={props.title}
+        image={props.Picture}
+        alt={props.Description}
       />
       <CardContent>
         <Typography variant="body2" color="text.secondary">
-          {props.info}
+          <div>Total units available: {props.NoU}</div>
+          Minimum units to purchase: {props.MoU}
         </Typography>
         <button className="bg-blue-400 mt-4 p-2 rounded-md text-white hover:bg-blue-600">
           I'm Interested

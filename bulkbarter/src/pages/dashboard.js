@@ -316,60 +316,14 @@ export default function Dashboard() {
           <main className="py-10">
             <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
               <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
+                Description="Pickle Jars (4L)"
+                User="Zaddimus Prime"
+                Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
+                Store="CostCo South Edmonton"
+                EndTime="Sep 17 10:15 a.m."
                 price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=49805&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
-              ></Listing>
-              <Listing
-                title="Pickle Jars (4L)"
-                img="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                date="Tomorrow"
-                info="Pickle Jars From mfin CostCo"
-                price="2.50"
+                MoU="4"
+                NoU="100"
               ></Listing>
             </div>
           </main>
