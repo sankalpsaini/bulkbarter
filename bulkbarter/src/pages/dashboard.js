@@ -14,6 +14,7 @@ import {
   ChevronDownIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/20/solid";
+import Listing from "../components/listing";
 import { collection, query, where, getDocs, doc, getDoc, addDoc, setDoc } from "firebase/firestore";
 import { db } from '../firebase_setup/firebase';
 import { getAuth } from "firebase/auth";
@@ -425,7 +426,18 @@ export default function Dashboard() {
           </div>
 
           <main className="py-10">
-            <div className="px-4 sm:px-6 lg:px-8">{/* Your content */}</div>
+            <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+              <Listing
+                Description="Pickle Jars (4L)"
+                User="Zaddimus Prime"
+                Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
+                Store="CostCo South Edmonton"
+                EndTime="Sep 17 10:15 a.m."
+                price="2.50"
+                MoU="4"
+                NoU="100"
+              ></Listing>
+            </div>
           </main>
         </div>
       </div>
