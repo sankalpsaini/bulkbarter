@@ -512,7 +512,7 @@ export default function Dashboard() {
           <main className="py-10">
 
             <div className="px-4 sm:px-6 lg:px-8">
-              <div className="absolute bottom-10 right-10">
+              <div className="bottom-10 right-10 fixed">
                 <Fab color="primary" aria-label="add" onClick={openModal}>
                   <AddIcon />
                 </Fab>
