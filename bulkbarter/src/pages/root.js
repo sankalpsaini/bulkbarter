@@ -6,6 +6,7 @@ import App from "../App";
 import SignIn from "./login";
 import SignUp from "./signup";
 import Dashboard from "./dashboard";
+import Trips from "./trips";
 
 export default function Root() {
   return (
@@ -17,6 +18,7 @@ export default function Root() {
         <Route path="signin" element={<SignIn />} />
         <Route path="signup" element={<SignUp />} />
         <Route path="dashboard" element={<Dashboard />} />
+        <Route path="trips" element={<Trips />} />
       </Routes>
     </>
   );

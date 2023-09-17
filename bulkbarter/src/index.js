@@ -1,17 +1,18 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+import React from "react";
+import ReactDOM from "react-dom/client";
 import {
   createBrowserRouter,
   // Outlet,
   RouterProvider,
 } from "react-router-dom";
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
-import SignIn from './pages/login';
-import SignUp from './pages/signup';
-import Root from './pages/root';
-import Dashboard from './pages/dashboard';
+import "./index.css";
+import App from "./App";
+import reportWebVitals from "./reportWebVitals";
+import SignIn from "./pages/login";
+import SignUp from "./pages/signup";
+import Root from "./pages/root";
+import Dashboard from "./pages/dashboard";
+import Trips from "./pages/trips";
 
 const router = createBrowserRouter([
   {
@@ -34,16 +35,19 @@ const router = createBrowserRouter([
         path: `/dashboard`,
         element: <Dashboard />,
       },
-    ]
+      {
+        path: `/trips`,
+        element: <Trips />,
+      },
+    ],
   },
 ]);
 
-
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
     {/* <App /> */}
-    <RouterProvider router={router}  />
+    <RouterProvider router={router} />
   </React.StrictMode>
 );
 
