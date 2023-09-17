@@ -1,3 +1,4 @@
+import React from 'react'
 import { Fragment, useState, useEffect } from "react";
 import { Dialog, Menu, Transition } from "@headlessui/react";
 import {
@@ -62,44 +63,6 @@ async function GetUserInfo() {
 }
 
 
-async function AddPost(data) {
-  try {
-    // Create a new post document
-    const party = [data.Username]
-    const postDocRef = await addDoc(collection(db, "Posts"), {
-      Description: data.get('description'),
-      EndTime: data.get('time'),
-      MoU: data.get('mou'),
-      NoU: data.get('nou'),
-      Party: party,
-      Picture: "",
-      Store: data.get('store'),
-      User: data.get('userName'),
-      Comid: "" // Initialize Comid with an empty string
-    });
-
-    console.log("Post Document written with ID: ", postDocRef.id);
-
-    // Create a new comment document
-    const commentDocRef = await addDoc(collection(db, "Comments"), {
-      Users: {} // Initialize Users with an empty map
-    });
-
-    console.log("Comment Document written with ID: ", commentDocRef.id);
-
-    // Update the Comid field in the post document with the ID of the comment document
-    await setDoc(collection(db, "Posts", postDocRef.id), {
-      Comid: commentDocRef.id
-    }, { merge: true });
-
-    console.log("Comid field in Post Document updated with Comment Document ID.");
-
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
-
 const navigation = [
   { name: "Shop", href: "#", icon: ShoppingBagIcon, current: true },
   { name: "Friends", href: "#", icon: UsersIcon, current: false },
@@ -125,28 +88,19 @@ export default function Dashboard() {
   const [mou, setMou] = React.useState(null);
   const [nou, setNou] = React.useState(null);
   const [store, setStore] = React.useState(null);
+  const [price, setPrice] = React.useState(null);
 
   let [isOpen, setIsOpen] = useState(true)
 
   async function AddPost() {
     try {
-      // Create a new post document
-      // const postDocRef = await addDoc(collection(db, "Posts"), {
-      //   Description: data.get('description'),
-      //   EndTime: data.get('time'),
-      //   MoU: data.get('mou'),
-      //   NoU: data.get('nou'),
-      //   Party: data.get('party'),
-      //   Picture: "",
-      //   Store: data.get('store'),
-      //   User: data.get('userName'),
-      //   Comid: "" // Initialize Comid with an empty string
       const postDocRef = await addDoc(collection(db, "Posts"), {
         Description: postDescription,
         EndTime: endTime,
         MoU: mou,
         NoU: nou,
         Party: "",
+        Price: price,
         Picture: "selectedImage",
         Store: store,
         User: "data.get('userName')",
@@ -538,6 +492,7 @@ export default function Dashboard() {
                                 <TextField type="text" color='primary' label="Minimum to buy" sx={{ m: 1 }} onChange={(e) => setMou(e.target.value)}/>
                                 <TextField type="text" color='primary' label="Store" sx={{ m: 1 }} onChange={(e) => setStore(e.target.value)}/>
                                 <TextField type="text" color='primary' label="End Time" sx={{ m: 1 }} onChange={(e) => setEndTime(e.target.value)}/>
+                                <TextField type="text" color='primary' label="Price" sx={{ m: 1 }} onChange={(e) => setPrice(e.target.value)}/>
                                 <div>
                                 {selectedImage && (
                                     <div>
