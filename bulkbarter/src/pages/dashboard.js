@@ -110,7 +110,7 @@ export default function Dashboard() {
 
   let [isOpen, setIsOpen] = useState(false);
 
-  async function AddPost() {
+  async function AddPost(name) {
     try {
       const postDocRef = await addDoc(collection(db, "Posts"), {
         Description: postDescription,
@@ -121,7 +121,7 @@ export default function Dashboard() {
         Price: price,
         Picture: selectedImage,
         Store: store,
-        User: "data.get('userName')",
+        User: name,
         Comid: "", // Initialize Comid with an empty string
       });
 
@@ -643,7 +643,7 @@ export default function Dashboard() {
                                 type="button"
                                 className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
                                 onClick={() => {
-                                  AddPost();
+                                  AddPost(firstName+" "+lastName);
                                   closeModal();
                                   fetchData();
                                 }}
@@ -659,19 +659,10 @@ export default function Dashboard() {
                 </Transition>
               </div>
 
-              <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
-                <Listing
-                  Description="Pickle Jars (4L)"
-                  User="Zaddimus Prime"
-                  Picture="https://images.costcobusinessdelivery.com/ImageDelivery/imageService?profileId=12027981&itemId=4352&recipeName=680"
-                  Store="CostCo South Edmonton"
-                  EndTime="Sep 17 10:15 a.m."
-                  price="2.50"
-                  MoU="4"
-                  NoU="100"
-                ></Listing>
-                {postsdb}
-              </div>
+
+            <div className="px-4 sm:px-6 lg:px-8 grid grid-cols-3 gap-4">
+              {postsdb}
+            </div>
             </div>
           </main>
         </div>
